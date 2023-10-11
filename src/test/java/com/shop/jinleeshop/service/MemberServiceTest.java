@@ -51,4 +51,20 @@ class MemberServiceTest {
         assertEquals(member.getRole(), savedMember.getRole());
     }
 
+    @Test
+    @DisplayName("중복 회원 가입 테스트")
+    public void saveDuplicateMemberTest() {
+        Member member1 = createMember();
+        Member member2 = createMember();
+        memberService.saveMember(member1);
+
+        // Junit의 Assertions 클래스의 assertThrows 메서드를 이용하면 예외 처리 테스트가 가능하다.
+        // 첫 번째 파라미터에는 발생할 예외 타입을 넣어준다.
+        Throwable e = assertThrows(IllegalStateException.class, () -> {
+           memberService.saveMember(member2);
+        });
+
+        assertEquals("이미 가입된 회원입니다.", e.getMessage());
+    }
+
 }
