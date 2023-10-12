@@ -3,6 +3,10 @@ package com.shop.jinleeshop.service;
 import com.shop.jinleeshop.entity.Member;
 import com.shop.jinleeshop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 */
 @Transactional
 @RequiredArgsConstructor
-public class MemberService {
+// UserDetailService 인터페이스는 데이터베이스에서 회원 정보를 가져오는 역할을 담당한다.
+public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -29,4 +34,20 @@ public class MemberService {
         }
     }
 
+    // 회원 정보를 조회하여 사용자의 정보와 권한을 갖는 UserDetails 인터페이스를 반환
+    // User 클래스는 UserDetails 인터페이스를 구현하고 있는 클래스
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member member = memberRepository.findByEmail(email);
+
+        if(member == null) {
+            throw new UsernameNotFoundException(email);
+        }
+
+        return User.builder()
+                .username(member.getEmail())
+                .password(member.getPassword())
+                .roles(member.getRole().toString())
+                .build();
+    }
 }
