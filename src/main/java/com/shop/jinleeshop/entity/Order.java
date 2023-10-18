@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @Getter @Setter
-public class Order {
+public class Order extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "order_id")
@@ -46,8 +46,10 @@ public class Order {
     // 하나의 Order가 여러 개의 OrderItem을 가지므로 List 자료형을 사용해서 매핑
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    /*
     private LocalDateTime regTime;
 
     private LocalDateTime updateTime;
+    */
 
 }
