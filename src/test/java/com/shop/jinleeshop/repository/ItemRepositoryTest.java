@@ -30,6 +30,7 @@ class ItemRepositoryTest {
     @Autowired
     ItemRepository itemRepository;
 
+    // 영속성 컨텍스트를 사용하기 위해 @PersistenceContext 어노테이션을 이용해 EntityManager빈을 주입
     @PersistenceContext
     EntityManager em;
 
