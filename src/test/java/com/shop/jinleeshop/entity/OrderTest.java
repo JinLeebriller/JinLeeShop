@@ -2,6 +2,7 @@ package com.shop.jinleeshop.entity;
 
 import com.shop.jinleeshop.constant.ItemSellStatus;
 import com.shop.jinleeshop.repository.ItemRepository;
+import com.shop.jinleeshop.repository.MemberRepository;
 import com.shop.jinleeshop.repository.OrderRepository;
 import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.DisplayName;
@@ -72,5 +73,39 @@ class OrderTest {
         Order savedOrder = orderRepository.findById(order.getId())
                                           .orElseThrow(EntityNotFoundException::new);
         assertEquals(3, savedOrder.getOrderItems().size());
+    }
+
+    @Autowired
+    MemberRepository memberRepository;
+
+    public Order createOrder() {
+        Order order = new Order();
+
+        for(int i = 0 ; i < 3 ; i++) {
+            Item item = createItem();
+            itemRepository.save(item);
+            OrderItem orderItem = new OrderItem();
+            orderItem.setItem(item);
+            orderItem.setCount(10);
+            orderItem.setOrderPrice(1000);
+            orderItem.setOrder(order);
+            order.getOrderItems().add(orderItem);
+        }
+
+        Member member = new Member();
+        memberRepository.save(member);
+
+        order.setMember(member);
+        orderRepository.save(order);
+        return order;
+    }
+
+    @Test
+    @DisplayName("고아객체 제거 테스트")
+    public void orphanRemovalTest() {
+        Order order = this.createOrder();
+        // Order 엔티티에서 관리하고 있는 orderItems 리스트의 0번째 인덱스 요소를 제거
+        order.getOrderItems().remove(0);
+        em.flush();
     }
 }
