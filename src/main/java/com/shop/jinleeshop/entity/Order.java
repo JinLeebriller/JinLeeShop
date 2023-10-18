@@ -20,7 +20,7 @@ public class Order {
     private Long id;
 
     // 한 명의 Member는 여러 번 주문할 수 있으므로 Order 엔티티 기준에서 다대일 단방향 매핑을 한다.
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -42,7 +42,7 @@ public class Order {
 
         orphanRemoval : 부모 엔티티와 연관 관계가 끊어진 자식 엔티티를 제거
     */
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     // 하나의 Order가 여러 개의 OrderItem을 가지므로 List 자료형을 사용해서 매핑
     private List<OrderItem> orderItems = new ArrayList<>();
 

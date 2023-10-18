@@ -3,6 +3,7 @@ package com.shop.jinleeshop.entity;
 import com.shop.jinleeshop.constant.ItemSellStatus;
 import com.shop.jinleeshop.repository.ItemRepository;
 import com.shop.jinleeshop.repository.MemberRepository;
+import com.shop.jinleeshop.repository.OrderItemRepository;
 import com.shop.jinleeshop.repository.OrderRepository;
 import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.DisplayName;
@@ -107,5 +108,24 @@ class OrderTest {
         // Order 엔티티에서 관리하고 있는 orderItems 리스트의 0번째 인덱스 요소를 제거
         order.getOrderItems().remove(0);
         em.flush();
+    }
+
+    @Autowired
+    OrderItemRepository orderItemRepository;
+
+    @Test
+    @DisplayName("지연 로딩 테스트")
+    public void lazyLoadingTest() {
+        Order order = this.createOrder();
+        Long orderItemId = order.getOrderItems().get(0).getId();
+        em.flush();
+        em.clear();
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                                                 .orElseThrow(EntityNotFoundException::new);
+        System.out.println("Order class : " + orderItem.getOrder().getClass());
+        System.out.println("==================================");
+        orderItem.getOrder().getOrderDate();
+        System.out.println("==================================");
     }
 }
