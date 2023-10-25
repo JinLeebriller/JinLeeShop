@@ -38,10 +38,11 @@ public class ItemService {
             ItemImg itemImg = new ItemImg();
             itemImg.setItem(item);
             // 첫 번째 이미지일 경우 대표 상품 이미지 여부 값을 "Y"로 세팅, 나머지는 "N"으로 설정
-            if(i == 0)
+            if(i == 0) {
                 itemImg.setRepimgYn("Y");
-            else
+            } else {
                 itemImg.setRepimgYn("N");
+            }
             // 상품 이미지 정보를 저장
             itemImgService.saveItemImg(itemImg, itemImgFileList.get(i));
         }
