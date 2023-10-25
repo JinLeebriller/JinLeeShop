@@ -71,6 +71,7 @@ public class ItemController {
         } catch (EntityNotFoundException e) {
             // 상품 엔티티가 존재하지 않을 경우 에러메시지를 담아서 상품 등록 페이지로 이동
             model.addAttribute("errorMessage", "존재하지 않는 상품입니다.");
+            model.addAttribute("itemFormDto", new ItemFormDto());
             return "item/itemForm";
         }
 
