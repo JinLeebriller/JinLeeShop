@@ -13,7 +13,7 @@ public class ItemImgDto {
 
     private String imgName;
 
-    private String oriImgname;
+    private String oriImgName;
 
     private String imgUrl;
 
@@ -27,7 +27,7 @@ public class ItemImgDto {
         ItemImgDto로 값을 복사해서 반환한다.
         static 메서드로 선언해 ItemImgDto 객체를 생성하지 않아도 호출할 수 있도록 하였다.
     */
-    private static ItemImgDto of(ItemImg itemImg) {
+    public static ItemImgDto of(ItemImg itemImg) {
         return modelMapper.map(itemImg, ItemImgDto.class);
     }
 
