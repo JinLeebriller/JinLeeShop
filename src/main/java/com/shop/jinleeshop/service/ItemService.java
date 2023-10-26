@@ -3,6 +3,7 @@ package com.shop.jinleeshop.service;
 import com.shop.jinleeshop.dto.ItemFormDto;
 import com.shop.jinleeshop.dto.ItemImgDto;
 import com.shop.jinleeshop.dto.ItemSearchDto;
+import com.shop.jinleeshop.dto.MainItemDto;
 import com.shop.jinleeshop.entity.Item;
 import com.shop.jinleeshop.entity.ItemImg;
 import com.shop.jinleeshop.repository.ItemImgRepository;
@@ -102,5 +103,8 @@ public class ItemService {
     public Page<Item> getAdminItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
         return itemRepository.getAdminItemPage(itemSearchDto, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<MainItemDto> getMainItemPage
 
 }

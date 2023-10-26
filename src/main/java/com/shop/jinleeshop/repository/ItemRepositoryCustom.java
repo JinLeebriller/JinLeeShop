@@ -1,6 +1,7 @@
 package com.shop.jinleeshop.repository;
 
 import com.shop.jinleeshop.dto.ItemSearchDto;
+import com.shop.jinleeshop.dto.MainItemDto;
 import com.shop.jinleeshop.entity.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,5 +14,8 @@ public interface ItemRepositoryCustom {
         반환 데이터로 Page<Item> 객체를 반환
     */
     Page<Item> getAdminItemPage(ItemSearchDto itemSearchDto, Pageable pageable);
+
+    // 메인 페이지에 보여줄 상품 리스트를 가져오는 메서드
+    Page<MainItemDto> getMainITtemPage(ItemSearchDto itemSearchDto, Pageable pageable);
 
 }
