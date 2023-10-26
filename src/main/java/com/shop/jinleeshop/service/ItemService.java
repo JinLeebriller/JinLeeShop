@@ -2,11 +2,14 @@ package com.shop.jinleeshop.service;
 
 import com.shop.jinleeshop.dto.ItemFormDto;
 import com.shop.jinleeshop.dto.ItemImgDto;
+import com.shop.jinleeshop.dto.ItemSearchDto;
 import com.shop.jinleeshop.entity.Item;
 import com.shop.jinleeshop.entity.ItemImg;
 import com.shop.jinleeshop.repository.ItemImgRepository;
 import com.shop.jinleeshop.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,6 +94,13 @@ public class ItemService {
         }
 
         return item.getId();
+    }
+
+    // 상품 조회 조건과 페이지 정보를 파라미터로 받아서 상품 데이터를 조회하는 ItemRepositoryCustom의 getAdminItemPage() 메서드를 추가
+    // 데이터의 수정이 일어나지 않으므로 최적화를 위해 @Transactional(readOnly=true) 어노테이션 설정
+    @Transactional(readOnly = true)
+    public Page<Item> getAdminItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
+        return itemRepository.getAdminItemPage(itemSearchDto, pageable);
     }
 
 }
