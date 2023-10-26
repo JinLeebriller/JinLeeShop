@@ -125,6 +125,7 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
                 .from(itemImg)
                 .join(itemImg.item, item)  // itemImg와 item을 내부 조인한다.
                 .where(itemImg.repimgYn.eq("Y"))  // 상품 이미지의 경우 대표 상품 이미지만 불러온다.
+                .where(itemNmLike(itemSearchDto.getSearchQuery()))
                 .orderBy(item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
