@@ -1,6 +1,7 @@
 package com.shop.jinleeshop.service;
 
 import com.shop.jinleeshop.constant.ItemSellStatus;
+import com.shop.jinleeshop.constant.OrderStatus;
 import com.shop.jinleeshop.dto.OrderDto;
 import com.shop.jinleeshop.entity.Item;
 import com.shop.jinleeshop.entity.Member;
@@ -9,6 +10,7 @@ import com.shop.jinleeshop.entity.OrderItem;
 import com.shop.jinleeshop.repository.ItemRepository;
 import com.shop.jinleeshop.repository.MemberRepository;
 import com.shop.jinleeshop.repository.OrderRepository;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +84,30 @@ class OrderServiceTest {
 
         // 주문한 상품의 총 가격과 데이터베이스에 저장된 상품의 가격을 비교하여 같으면 테스트가 성공적으로 종료
         assertEquals(totalPrice, order.getTotalPrice());
+    }
+
+    @Test
+    @DisplayName("주문 취소 테스트")
+    public void cancelOrder() {
+        // 테스트를 위해서 상품과 회원 데이터를 생성(생성된 상품의 재고는 100개)
+        Item item = saveItem();
+        Member member = saveMember();
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setCount(10);
+        orderDto.setItemId(item.getId());
+        // 테스트를 위해서 주문 데이터를 생성(주문 개수는 총 10개)
+        Long orderId = orderService.order(orderDto, member.getEmail());
+
+        // 생성한 주문 엔티티를 조회
+        Order order = orderRepository.findById(orderId).orElseThrow(EntityExistsException::new);
+        // 해당 주문을 취소
+        orderService.cancelOrder(orderId);
+
+        // 주문의 상태가 취소 상태라면 테스트 통과
+        assertEquals(OrderStatus.CANCEL, order.getOrderStatus());
+        // 취소 후 상품의 재고가 처음 재고 개수인 100개와 동일하다면 테스트 통과
+        assertEquals(100, item.getStockNumber());
     }
 
 }
