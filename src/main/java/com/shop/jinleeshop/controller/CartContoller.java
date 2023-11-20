@@ -1,13 +1,16 @@
 package com.shop.jinleeshop.controller;
 
+import com.shop.jinleeshop.dto.CartDetailDto;
 import com.shop.jinleeshop.dto.CartItemDto;
 import com.shop.jinleeshop.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,6 +52,15 @@ public class CartContoller {
 
         // 결과값으로 생성된 장바구니 상품 아이디와 요청이 성공하였다는 HTTP 응답 상태 코드를 반환
         return new ResponseEntity<Long>(cartItemId, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cart")
+    public String orderHist(Principal principal, Model model) {
+        // 현재 로그인한 사용자의 이메일 정보를 이용하여 장바구니에 담겨있는 상품 정보를 조회
+        List<CartDetailDto> cartDetailList = cartService.getCartList(principal.getName());
+        // 조회한 장바구니 상품 정보를 뷰로 전달
+        model.addAttribute("cartItems", cartDetailList);
+        return "cart/cartList";
     }
 
 }
