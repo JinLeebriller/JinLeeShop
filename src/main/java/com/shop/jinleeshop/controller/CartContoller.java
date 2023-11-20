@@ -2,6 +2,7 @@ package com.shop.jinleeshop.controller;
 
 import com.shop.jinleeshop.dto.CartDetailDto;
 import com.shop.jinleeshop.dto.CartItemDto;
+import com.shop.jinleeshop.dto.CartOrderDto;
 import com.shop.jinleeshop.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -90,5 +91,30 @@ public class CartContoller {
         // 해당 장바구니 상품을 삭제
         cartService.deleteCartItem(cartItemId);
         return new ResponseEntity<Long>(cartItemId, HttpStatus.OK);
+    }
+
+    // 장바구니 상품의 수량을 업데이트하는 요청을 처리할 수 있도록 하는 로직
+    @PostMapping(value = "/cart/orders")
+    public @ResponseBody ResponseEntity orderCartItem(@RequestBody CartOrderDto cartOrderDto, Principal principal) {
+
+        List<CartOrderDto> cartOrderDtoList = cartOrderDto.getCartOrderDtoList();
+
+        // 주문할 상품을 선택하지 않았는지 체크
+        if(cartOrderDtoList == null || cartOrderDtoList.size() == 0) {
+            return new ResponseEntity<String>("주문할 상품을 선택해주세요", HttpStatus.FORBIDDEN);
+        }
+
+        // 주문 권한을 체크
+        for(CartOrderDto cartOrder : cartOrderDtoList) {
+            if(!cartService.validateCartItem(cartOrder.getCartItemId(), principal.getName())) {
+                return new ResponseEntity<String>("주문 권한이 없습니다.", HttpStatus.FORBIDDEN);
+            }
+        }
+
+        // 주문 로직 호출 결과 생성된 주문 번호를 반환
+        Long orderId = cartService.orderCartItem(cartOrderDtoList, principal.getName());
+
+        // 생성된 주문 번호와 요청이 성공했다는 HTTP 응답 상태 코드를 반환
+        return new ResponseEntity<Long>(orderId, HttpStatus.OK);
     }
 }
