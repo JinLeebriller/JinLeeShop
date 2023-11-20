@@ -2,15 +2,15 @@ package com.shop.jinleeshop.service;
 
 import com.shop.jinleeshop.dto.CartDetailDto;
 import com.shop.jinleeshop.dto.CartItemDto;
-import com.shop.jinleeshop.entity.Cart;
-import com.shop.jinleeshop.entity.CartItem;
-import com.shop.jinleeshop.entity.Item;
-import com.shop.jinleeshop.entity.Member;
+import com.shop.jinleeshop.dto.CartOrderDto;
+import com.shop.jinleeshop.dto.OrderDto;
+import com.shop.jinleeshop.entity.*;
 import com.shop.jinleeshop.repository.CartItemRepository;
 import com.shop.jinleeshop.repository.CartRepository;
 import com.shop.jinleeshop.repository.ItemRepository;
 import com.shop.jinleeshop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
@@ -28,6 +28,7 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final OrderService orderService;
 
     public Long addCart(CartItemDto cartItemDto, String email) {
         // 장바구니에 담을 상품 엔티티를 조회
@@ -108,5 +109,30 @@ public class CartService {
     public void deleteCartItem(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(EntityNotFoundException::new);
         cartItemRepository.delete(cartItem);
+    }
+
+    // 주문 로직으로 전달할 orderDto 리스트 생성 및 주문 로직 호출, 주문한 상품은 장바구니에서 제거하는 로직
+    public Long orderCartItem(List<CartOrderDto> cartOrderDtoList, String email) {
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        // 장바구니 페이지에서 전달받은 주문 상품 번호를 이용하여 주문 로직으로 전달할 orderDto 객체 생성
+        for(CartOrderDto cartOrderDto : cartOrderDtoList) {
+            CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId()).orElseThrow(EntityNotFoundException::new);
+
+            OrderDto orderDto = new OrderDto();
+            orderDto.setItemId(cartItem.getItem().getId());
+            orderDto.setCount(cartItem.getCount());
+            orderDtoList.add(orderDto);
+        }
+
+        // 장바구니에 담은 상품을 주문하도록 주문 로직을 호출
+        Long orderId = orderService.orders(orderDtoList, email);
+
+        // 주문한 상품들을 장바구니에서 제거
+        for(CartOrderDto cartOrderDto : cartOrderDtoList) {
+            CartItem cartItem = cartItemRepository.findById(cartOrderDto.getCartItemId()).orElseThrow(EntityNotFoundException::new);
+            cartItemRepository.delete(cartItem);
+        }
+
+        return orderId;
     }
 }
