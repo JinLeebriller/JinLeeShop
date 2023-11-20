@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+// 장바구니 조회 페이지에 전달할 DTO 클래스
 public class CartDetailDto {
 
     // 장바구니 상품 아이디
