@@ -13,6 +13,7 @@ import com.shop.jinleeshop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -78,4 +79,28 @@ public class CartService {
         return cartDetailDtoList;
     }
 
+    // 자바스크립트 코드에서 업데이트할 장바구니 상품 번호는 조작이 가능하므로
+    // 현재 로그인한 회원과 해당 장바구니 상품을 저장한 회원이 같은지 검사하는 로직도 작성
+    @Transactional(readOnly = true)
+    public boolean validateCartItem(Long cartItemId, String email) {
+        // 현재 로그인한 회원을 조회
+        Member curMember = memberRepository.findByEmail(email);
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(EntityNotFoundException::new);
+        // 장바구니 상품을 저장한 회원을 조회
+        Member savedMember = cartItem.getCart().getMember();
+
+        // 현재 로그인한 회원과 장바구니 상품을 저장한 회원이 다를 경우 false를, 같으면 true를 반환
+        if(!StringUtils.equals(curMember.getEmail(), savedMember.getEmail())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // 장바구니 상품의 수량을 업데이트하는 로직
+    public void updateCartItemCount(Long cartItemId, int count) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(EntityNotFoundException::new);
+
+        cartItem.updateCount(count);
+    }
 }

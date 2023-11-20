@@ -61,6 +61,7 @@
             getOrderTotalPrice();
         }
 
+        <!-- 장바구니 상품의 수량을 수정할 경우 업데이트 요청 -->
         function updateCartItemCount(cartItemId, count){
             var token = $("meta[name='_csrf']").attr("content");
             var header = $("meta[name='_csrf_header']").attr("content");
@@ -69,7 +70,7 @@
 
             $.ajax({
                 url      : url,
-                type     : "PATCH",
+                type     : "PATCH", <!-- 부분 업데이트이므로 PATCH TYPE으로 설정 -->
                 beforeSend : function(xhr){
                     /* 데이터를 전송하기 전에 헤더에 csrf값을 설정 */
                     xhr.setRequestHeader(header, token);

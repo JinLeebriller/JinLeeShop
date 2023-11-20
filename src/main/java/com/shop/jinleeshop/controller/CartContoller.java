@@ -7,13 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -61,6 +59,24 @@ public class CartContoller {
         // 조회한 장바구니 상품 정보를 뷰로 전달
         model.addAttribute("cartItems", cartDetailList);
         return "cart/cartList";
+    }
+
+    // 장바구니의 수량을 업데이트하는 요청을 처리할 수 있도록 하는 로직
+    // HTTP 메서드에서 PATCH는 요청된 자원의 일부를 업데이트할 때 사용(여기서는 장바구니 상품의 수량만 업데이트)
+    @PatchMapping(value = "/cartItem/{cartItemId}")
+    public @ResponseBody ResponseEntity updateCartItem(@PathVariable("cartItemId") Long cartItemId, int count, Principal principal) {
+
+        // 장바구니에 담겨있는 상품의 개수를 0개 이하로 업데이트 요청을 할 때 에러 메시지를 담아서 반환
+        if(count <= 0) {
+            return new ResponseEntity<String> ("최소 1개 이상 담아주세요", HttpStatus.BAD_REQUEST);
+          // 수정 권한을 체크
+        } else if(!cartService.validateCartItem(cartItemId, principal.getName())) {
+            return new ResponseEntity<String>("수정 권한이 없습니다.", HttpStatus.FORBIDDEN);
+        }
+
+        // 장바구니 상품의 개수를 업데이트
+        cartService.updateCartItemCount(cartItemId, count);
+        return new ResponseEntity<Long>(cartItemId, HttpStatus.OK);
     }
 
 }
